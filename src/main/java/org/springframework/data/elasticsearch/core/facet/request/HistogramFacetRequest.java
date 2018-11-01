@@ -19,7 +19,7 @@ package org.springframework.data.elasticsearch.core.facet.request;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.springframework.data.elasticsearch.core.facet.AbstractFacetRequest;
 import org.springframework.util.Assert;
@@ -32,42 +32,42 @@ import org.springframework.util.Assert;
 @Deprecated
 public class HistogramFacetRequest extends AbstractFacetRequest {
 
-	private String field;
-	private long interval;
-	private DateHistogramInterval timeUnit;
+    private String field;
+    private long interval;
+    private DateHistogramInterval timeUnit;
 
-	public HistogramFacetRequest(String name) {
-		super(name);
-	}
+    public HistogramFacetRequest(String name) {
+        super(name);
+    }
 
-	public void setField(String field) {
-		this.field = field;
-	}
+    public void setField(String field) {
+        this.field = field;
+    }
 
-	public void setInterval(long interval) {
-		this.interval = interval;
-	}
+    public void setInterval(long interval) {
+        this.interval = interval;
+    }
 
-	public void setTimeUnit(DateHistogramInterval timeUnit) {
-		this.timeUnit = timeUnit;
-	}
+    public void setTimeUnit(DateHistogramInterval timeUnit) {
+        this.timeUnit = timeUnit;
+    }
 
-	public AbstractAggregationBuilder getFacet() {
-		Assert.notNull(getName(), "Facet name can't be a null !!!");
-		Assert.isTrue(StringUtils.isNotBlank(field), "Please select field on which to build the facet !!!");
-		Assert.isTrue(interval > 0, "Please provide interval as positive value greater them zero !!!");
+    public AbstractAggregationBuilder getFacet() {
+        Assert.notNull(getName(), "Facet name can't be a null !!!");
+        Assert.isTrue(StringUtils.isNotBlank(field), "Please select field on which to build the facet !!!");
+        Assert.isTrue(interval > 0, "Please provide interval as positive value greater them zero !!!");
 
-		DateHistogramBuilder dateHistogramBuilder = AggregationBuilders.dateHistogram(getName());
-		dateHistogramBuilder.field(field);
+        DateHistogramAggregationBuilder dateHistogramBuilder = AggregationBuilders.dateHistogram(getName());
+        dateHistogramBuilder.field(field);
 
-		if (timeUnit != null) {
-			dateHistogramBuilder.interval(timeUnit);
-		} else {
-			dateHistogramBuilder.interval(interval);
-		}
+        if (timeUnit != null) {
+            dateHistogramBuilder.dateHistogramInterval(timeUnit);
+        } else {
+            dateHistogramBuilder.interval(interval);
+        }
 
-		dateHistogramBuilder.subAggregation(AggregationBuilders.extendedStats(INTERNAL_STATS));
+        dateHistogramBuilder.subAggregation(AggregationBuilders.extendedStats(INTERNAL_STATS));
 
-		return dateHistogramBuilder;
-	}
+        return dateHistogramBuilder;
+    }
 }
