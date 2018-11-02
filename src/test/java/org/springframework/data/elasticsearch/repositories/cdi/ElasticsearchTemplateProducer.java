@@ -19,7 +19,9 @@ import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 
+import org.elasticsearch.client.Client;
 import org.elasticsearch.client.node.NodeClient;
+import org.elasticsearch.node.NodeValidationException;
 import org.springframework.data.elasticsearch.Utils;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
@@ -31,19 +33,19 @@ import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 class ElasticsearchTemplateProducer {
 
 	@Produces
-	public NodeClient createNodeClient() {
+	public Client createNodeClient() throws NodeValidationException {
 		return Utils.getNodeClient();
 	}
 
 	@Produces
-	public ElasticsearchOperations createElasticsearchTemplate(NodeClient nodeClient) {
+	public ElasticsearchOperations createElasticsearchTemplate(Client nodeClient) {
 		return new ElasticsearchTemplate(nodeClient);
 	}
 
 	@Produces
 	@OtherQualifier
 	@PersonDB
-	public ElasticsearchOperations createQualifiedElasticsearchTemplate(NodeClient nodeClient) {
+	public ElasticsearchOperations createQualifiedElasticsearchTemplate(Client nodeClient) {
 		return new ElasticsearchTemplate(nodeClient);
 	}
 

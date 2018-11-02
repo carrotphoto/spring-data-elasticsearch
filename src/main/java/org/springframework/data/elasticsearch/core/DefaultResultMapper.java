@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,6 @@
  * limitations under the License.
  */
 package org.springframework.data.elasticsearch.core;
-
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -45,143 +36,152 @@ import org.springframework.data.elasticsearch.core.mapping.ElasticsearchPersiste
 import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.mapping.context.MappingContext;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * @author Artur Konczak
  * @author Petar Tahchiev
  * @author Young Gu
  * @author Oliver Gierke
+ * @author Mark Paluch
  */
 public class DefaultResultMapper extends AbstractResultMapper {
 
-	private MappingContext<? extends ElasticsearchPersistentEntity<?>, ElasticsearchPersistentProperty> mappingContext;
+    private MappingContext<? extends ElasticsearchPersistentEntity<?>, ElasticsearchPersistentProperty> mappingContext;
 
-	public DefaultResultMapper() {
-		super(new DefaultEntityMapper());
-	}
+    public DefaultResultMapper() {
+        super(new DefaultEntityMapper());
+    }
 
-	public DefaultResultMapper(MappingContext<? extends ElasticsearchPersistentEntity<?>, ElasticsearchPersistentProperty> mappingContext) {
-		super(new DefaultEntityMapper());
-		this.mappingContext = mappingContext;
-	}
+    public DefaultResultMapper(MappingContext<? extends ElasticsearchPersistentEntity<?>, ElasticsearchPersistentProperty> mappingContext) {
+        super(new DefaultEntityMapper());
+        this.mappingContext = mappingContext;
+    }
 
-	public DefaultResultMapper(EntityMapper entityMapper) {
-		super(entityMapper);
-	}
+    public DefaultResultMapper(EntityMapper entityMapper) {
+        super(entityMapper);
+    }
 
-	public DefaultResultMapper(
-			MappingContext<? extends ElasticsearchPersistentEntity<?>, ElasticsearchPersistentProperty> mappingContext,
-			EntityMapper entityMapper) {
-		super(entityMapper);
-		this.mappingContext = mappingContext;
-	}
+    public DefaultResultMapper(
+            MappingContext<? extends ElasticsearchPersistentEntity<?>, ElasticsearchPersistentProperty> mappingContext,
+            EntityMapper entityMapper) {
+        super(entityMapper);
+        this.mappingContext = mappingContext;
+    }
 
-	@Override
-	public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> clazz, Pageable pageable) {
-		long totalHits = response.getHits().totalHits();
-		List<T> results = new ArrayList<T>();
-		for (SearchHit hit : response.getHits()) {
-			if (hit != null) {
-				T result = null;
-				if (StringUtils.isNotBlank(hit.sourceAsString())) {
-					result = mapEntity(hit.sourceAsString(), clazz);
-				} else {
-					result = mapEntity(hit.getFields().values(), clazz);
-				}
-				setPersistentEntityId(result, hit.getId(), clazz);
-				populateScriptFields(result, hit);
-				results.add(result);
-			}
-		}
+    @Override
+    public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> clazz, Pageable pageable) {
+        long totalHits = response.getHits().totalHits();
+        List<T> results = new ArrayList<>();
+        for (SearchHit hit : response.getHits()) {
+            if (hit != null) {
+                T result = null;
+                if (StringUtils.isNotBlank(hit.sourceAsString())) {
+                    result = mapEntity(hit.sourceAsString(), clazz);
+                } else {
+                    result = mapEntity(hit.getFields().values(), clazz);
+                }
+                setPersistentEntityId(result, hit.getId(), clazz);
+                populateScriptFields(result, hit);
+                results.add(result);
+            }
+        }
 
-		return new AggregatedPageImpl<T>(results, pageable, totalHits, response.getAggregations());
-	}
+        return new AggregatedPageImpl<T>(results, pageable, totalHits, response.getAggregations(), response.getScrollId());
+    }
 
-	private <T> void populateScriptFields(T result, SearchHit hit) {
-		if (hit.getFields() != null && !hit.getFields().isEmpty() && result != null) {
-			for (java.lang.reflect.Field field : result.getClass().getDeclaredFields()) {
-				ScriptedField scriptedField = field.getAnnotation(ScriptedField.class);
-				if (scriptedField != null) {
-					String name = scriptedField.name().isEmpty() ? field.getName() : scriptedField.name();
-					SearchHitField searchHitField = hit.getFields().get(name);
-					if (searchHitField != null) {
-						field.setAccessible(true);
-						try {
-							field.set(result, searchHitField.getValue());
-						} catch (IllegalArgumentException e) {
-							throw new ElasticsearchException("failed to set scripted field: " + name + " with value: "
-									+ searchHitField.getValue(), e);
-						} catch (IllegalAccessException e) {
-							throw new ElasticsearchException("failed to access scripted field: " + name, e);
-						}
-					}
-				}
-			}
-		}
-	}
+    private <T> void populateScriptFields(T result, SearchHit hit) {
+        if (hit.getFields() != null && !hit.getFields().isEmpty() && result != null) {
+            for (java.lang.reflect.Field field : result.getClass().getDeclaredFields()) {
+                ScriptedField scriptedField = field.getAnnotation(ScriptedField.class);
+                if (scriptedField != null) {
+                    String name = scriptedField.name().isEmpty() ? field.getName() : scriptedField.name();
+                    SearchHitField searchHitField = hit.getFields().get(name);
+                    if (searchHitField != null) {
+                        field.setAccessible(true);
+                        try {
+                            field.set(result, searchHitField.getValue());
+                        } catch (IllegalArgumentException e) {
+                            throw new ElasticsearchException("failed to set scripted field: " + name + " with value: "
+                                    + searchHitField.getValue(), e);
+                        } catch (IllegalAccessException e) {
+                            throw new ElasticsearchException("failed to access scripted field: " + name, e);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
+    private <T> T mapEntity(Collection<SearchHitField> values, Class<T> clazz) {
+        return mapEntity(buildJSONFromFields(values), clazz);
+    }
 
-	private <T> T mapEntity(Collection<SearchHitField> values, Class<T> clazz) {
-		return mapEntity(buildJSONFromFields(values), clazz);
-	}
+    private String buildJSONFromFields(Collection<SearchHitField> values) {
+        JsonFactory nodeFactory = new JsonFactory();
+        try {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            JsonGenerator generator = nodeFactory.createGenerator(stream, JsonEncoding.UTF8);
+            generator.writeStartObject();
+            for (SearchHitField value : values) {
+                if (value.getValues().size() > 1) {
+                    generator.writeArrayFieldStart(value.getName());
+                    for (Object val : value.getValues()) {
+                        generator.writeObject(val);
+                    }
+                    generator.writeEndArray();
+                } else {
+                    generator.writeObjectField(value.getName(), value.getValue());
+                }
+            }
+            generator.writeEndObject();
+            generator.flush();
+            return new String(stream.toByteArray(), Charset.forName("UTF-8"));
+        } catch (IOException e) {
+            return null;
+        }
+    }
 
-	private String buildJSONFromFields(Collection<SearchHitField> values) {
-		JsonFactory nodeFactory = new JsonFactory();
-		try {
-			ByteArrayOutputStream stream = new ByteArrayOutputStream();
-			JsonGenerator generator = nodeFactory.createGenerator(stream, JsonEncoding.UTF8);
-			generator.writeStartObject();
-			for (SearchHitField value : values) {
-				if (value.getValues().size() > 1) {
-					generator.writeArrayFieldStart(value.getName());
-					for (Object val : value.getValues()) {
-						generator.writeObject(val);
-					}
-					generator.writeEndArray();
-				} else {
-					generator.writeObjectField(value.getName(), value.getValue());
-				}
-			}
-			generator.writeEndObject();
-			generator.flush();
-			return new String(stream.toByteArray(), Charset.forName("UTF-8"));
-		} catch (IOException e) {
-			return null;
-		}
-	}
+    @Override
+    public <T> T mapResult(GetResponse response, Class<T> clazz) {
+        T result = mapEntity(response.getSourceAsString(), clazz);
+        if (result != null) {
+            setPersistentEntityId(result, response.getId(), clazz);
+        }
+        return result;
+    }
 
-	@Override
-	public <T> T mapResult(GetResponse response, Class<T> clazz) {
-		T result = mapEntity(response.getSourceAsString(), clazz);
-		if (result != null) {
-			setPersistentEntityId(result, response.getId(), clazz);
-		}
-		return result;
-	}
+    @Override
+    public <T> LinkedList<T> mapResults(MultiGetResponse responses, Class<T> clazz) {
+        LinkedList<T> list = new LinkedList<>();
+        for (MultiGetItemResponse response : responses.getResponses()) {
+            if (!response.isFailed() && response.getResponse().isExists()) {
+                T result = mapEntity(response.getResponse().getSourceAsString(), clazz);
+                setPersistentEntityId(result, response.getResponse().getId(), clazz);
+                list.add(result);
+            }
+        }
+        return list;
+    }
 
-	@Override
-	public <T> LinkedList<T> mapResults(MultiGetResponse responses, Class<T> clazz) {
-		LinkedList<T> list = new LinkedList<T>();
-		for (MultiGetItemResponse response : responses.getResponses()) {
-			if (!response.isFailed() && response.getResponse().isExists()) {
-				T result = mapEntity(response.getResponse().getSourceAsString(), clazz);
-				setPersistentEntityId(result, response.getResponse().getId(), clazz);
-				list.add(result);
-			}
-		}
-		return list;
-	}
+    private <T> void setPersistentEntityId(T result, String id, Class<T> clazz) {
 
-	private <T> void setPersistentEntityId(T result, String id, Class<T> clazz) {
+        if (mappingContext != null && clazz.isAnnotationPresent(Document.class)) {
 
-		if (mappingContext != null && clazz.isAnnotationPresent(Document.class)) {
+            ElasticsearchPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(clazz);
+            PersistentProperty<?> idProperty = persistentEntity.getIdProperty();
 
-			ElasticsearchPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(clazz);
-			PersistentProperty<?> idProperty = persistentEntity.getIdProperty();
-			
-			// Only deal with String because ES generated Ids are strings !
-			if (idProperty != null && idProperty.getType().isAssignableFrom(String.class)) {
-				persistentEntity.getPropertyAccessor(result).setProperty(idProperty, id);
-			}
-		}
-	}
+            // Only deal with String because ES generated Ids are strings !
+            if (idProperty != null && idProperty.getType().isAssignableFrom(String.class)) {
+                persistentEntity.getPropertyAccessor(result).setProperty(idProperty, id);
+            }
+
+        }
+    }
 }

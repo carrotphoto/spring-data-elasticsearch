@@ -15,13 +15,12 @@
  */
 package org.springframework.data.elasticsearch.entities;
 
-import static org.springframework.data.elasticsearch.annotations.FieldIndex.*;
-import static org.springframework.data.elasticsearch.annotations.FieldType.String;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
+
+import static org.springframework.data.elasticsearch.annotations.FieldType.text;
 
 /**
  * @author Jakub Vavrik
@@ -32,7 +31,7 @@ public class SampleTransientEntity {
 	@Id
 	private String id;
 
-	@Field(type = String, index = not_analyzed, store = true, analyzer = "standard")
+	@Field(type = text, index = false, store = true, analyzer = "standard")
 	private String message;
 
 	@Transient

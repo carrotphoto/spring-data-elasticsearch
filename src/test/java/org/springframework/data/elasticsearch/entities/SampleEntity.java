@@ -24,6 +24,8 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.elasticsearch.annotations.ScriptedField;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 
+import static org.springframework.data.elasticsearch.annotations.FieldType.text;
+
 /**
  * @author Rizwan Idrees
  * @author Mohsin Husen
@@ -37,52 +39,54 @@ import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 @Document(indexName = "test-index", type = "test-type", shards = 1, replicas = 0, refreshInterval = "-1")
 public class SampleEntity {
 
-	@Id
-	private String id;
-	private String type;
-	@Field(type = FieldType.String)
-	private String message;
-	private int rate;
-	@ScriptedField
-	private Long scriptedRate;
-	private boolean available;
-	private String highlightedMessage;
+    @Id
+    private String id;
 
-	private GeoPoint location;
+    @Field(type = text, store = true, fielddata = true)
+    private String type;
+    @Field(type = FieldType.text, fielddata = true)
+    private String message;
+    private int rate;
+    @ScriptedField
+    private Double scriptedRate;
+    private boolean available;
+    private String highlightedMessage;
 
-	@Version
-	private Long version;
+    private GeoPoint location;
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+    @Version
+    private Long version;
 
-		SampleEntity that = (SampleEntity) o;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-		if (available != that.available) return false;
-		if (rate != that.rate) return false;
-		if (highlightedMessage != null ? !highlightedMessage.equals(that.highlightedMessage) : that.highlightedMessage != null)
-			return false;
-		if (id != null ? !id.equals(that.id) : that.id != null) return false;
-		if (location != null ? !location.equals(that.location) : that.location != null) return false;
-		if (message != null ? !message.equals(that.message) : that.message != null) return false;
-		if (type != null ? !type.equals(that.type) : that.type != null) return false;
-		if (version != null ? !version.equals(that.version) : that.version != null) return false;
+        SampleEntity that = (SampleEntity) o;
 
-		return true;
-	}
+        if (available != that.available) return false;
+        if (rate != that.rate) return false;
+        if (highlightedMessage != null ? !highlightedMessage.equals(that.highlightedMessage) : that.highlightedMessage != null)
+            return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (location != null ? !location.equals(that.location) : that.location != null) return false;
+        if (message != null ? !message.equals(that.message) : that.message != null) return false;
+        if (type != null ? !type.equals(that.type) : that.type != null) return false;
+        if (version != null ? !version.equals(that.version) : that.version != null) return false;
 
-	@Override
-	public int hashCode() {
-		int result = id != null ? id.hashCode() : 0;
-		result = 31 * result + (type != null ? type.hashCode() : 0);
-		result = 31 * result + (message != null ? message.hashCode() : 0);
-		result = 31 * result + rate;
-		result = 31 * result + (available ? 1 : 0);
-		result = 31 * result + (highlightedMessage != null ? highlightedMessage.hashCode() : 0);
-		result = 31 * result + (location != null ? location.hashCode() : 0);
-		result = 31 * result + (version != null ? version.hashCode() : 0);
-		return result;
-	}
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (message != null ? message.hashCode() : 0);
+        result = 31 * result + rate;
+        result = 31 * result + (available ? 1 : 0);
+        result = 31 * result + (highlightedMessage != null ? highlightedMessage.hashCode() : 0);
+        result = 31 * result + (location != null ? location.hashCode() : 0);
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        return result;
+    }
 }

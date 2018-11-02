@@ -15,12 +15,7 @@
  */
 package org.springframework.data.elasticsearch.annotations;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * @author Rizwan Idrees
@@ -38,13 +33,15 @@ public @interface Field {
 
 	FieldType type() default FieldType.Auto;
 
-	FieldIndex index() default FieldIndex.analyzed;
+	boolean index() default true;
 
 	DateFormat format() default DateFormat.none;
 
 	String pattern() default "";
 
 	boolean store() default false;
+
+	boolean fielddata() default false;
 
 	String searchAnalyzer() default "";
 

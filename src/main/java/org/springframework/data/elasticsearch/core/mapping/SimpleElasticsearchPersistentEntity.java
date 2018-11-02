@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.data.elasticsearch.core.mapping;
 import static org.springframework.util.StringUtils.*;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -41,6 +42,7 @@ import org.springframework.util.Assert;
  * @param <T>
  * @author Rizwan Idrees
  * @author Mohsin Husen
+ * @author Mark Paluch
  */
 public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntity<T, ElasticsearchPersistentProperty>
 		implements ElasticsearchPersistentEntity<T>, ApplicationContextAware {
@@ -152,15 +154,14 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
 	public void addPersistentProperty(ElasticsearchPersistentProperty property) {
 		super.addPersistentProperty(property);
 
-		if (property.getField() != null) {
-			Parent parent = property.getField().getAnnotation(Parent.class);
-			if (parent != null) {
-				Assert.isNull(this.parentIdProperty, "Only one field can hold a @Parent annotation");
-				Assert.isNull(this.parentType, "Only one field can hold a @Parent annotation");
-				Assert.isTrue(property.getType() == String.class, "Parent ID property should be String");
-				this.parentIdProperty = property;
-				this.parentType = parent.type();
-			}
+		Parent annotation = property.findAnnotation(Parent.class);
+
+		if (annotation != null) {
+			Assert.isNull(this.parentIdProperty, "Only one field can hold a @Parent annotation");
+			Assert.isNull(this.parentType, "Only one field can hold a @Parent annotation");
+			Assert.isTrue(property.getType() == String.class, "Parent ID property should be String");
+			this.parentIdProperty = property;
+			this.parentType = annotation.type();
 		}
 
 		if (property.isVersionProperty()) {

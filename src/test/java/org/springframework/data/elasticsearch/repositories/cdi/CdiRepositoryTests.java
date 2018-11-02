@@ -87,7 +87,6 @@ public class CdiRepositoryTests {
 	}
 
 	/**
-	 * @see DATAES-234
 	 */
 	@Test
 	public void testQualifiedCdiRepository() {
@@ -118,7 +117,6 @@ public class CdiRepositoryTests {
 	}
 
 	/**
-	 * @see DATAES-113
 	 */
 	@Test
 	public void returnOneFromCustomImpl() {

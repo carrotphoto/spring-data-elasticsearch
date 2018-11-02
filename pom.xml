@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.springframework.data</groupId>
-    <artifactId>spring-data-elasticsearch</artifactId>
-    <version>2.1.9.RELEASE</version>
+    <artifactId>spring-data-elasticsearch-es550</artifactId>
+    <version>2.1.9-SNAPSHOT</version>
 
     <parent>
         <groupId>org.springframework.data.build</groupId>
@@ -13,8 +14,8 @@
         <relativePath>../spring-data-build/parent/pom.xml</relativePath>
     </parent>
 
-    <name>Spring Data Elasticsearch</name>
-    <description>Spring Data Implementation for Elasticsearch</description>
+    <name>Spring Data Elasticsearch With Elasticsearch Version 5.5.0</name>
+    <description>Spring Data Implementation for Elasticsearch nnd with Elasticsearch version 5.5.0</description>
     <url>https://github.com/spring-projects/spring-data-elasticsearch</url>
 
     <properties>
@@ -23,8 +24,11 @@
 
         <commonscollections>3.2.1</commonscollections>
         <commonslang>2.6</commonslang>
-        <elasticsearch>2.4.0</elasticsearch>
+        <elasticsearch>5.5.0</elasticsearch>
         <springdata.commons>1.13.9.RELEASE</springdata.commons>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
 
     </properties>
 
@@ -75,6 +79,26 @@
             <version>${elasticsearch}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>transport</artifactId>
+            <version>${elasticsearch}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <!-- required by elasticsearch -->
+            <groupId>org.elasticsearch.plugin</groupId>
+            <artifactId>transport-netty4-client</artifactId>
+            <version>${elasticsearch}</version>
+            <!--<scope>test</scope>-->
+        </dependency>
+
         <!-- Jackson JSON Mapper -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -86,7 +110,7 @@
             <artifactId>jackson-databind</artifactId>
             <version>${jackson}</version>
         </dependency>
-        
+
         <!-- CDI -->
         <dependency>
             <groupId>javax.enterprise</groupId>
@@ -101,7 +125,14 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.apache.openwebbeans.test</groupId>
             <artifactId>cditest-owb</artifactId>
@@ -132,6 +163,18 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>1.7.22</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.8.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -147,6 +190,14 @@
             <plugin>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <compilerVersion>1.8</compilerVersion>
+                </configuration>
             </plugin>
         </plugins>
     </build>

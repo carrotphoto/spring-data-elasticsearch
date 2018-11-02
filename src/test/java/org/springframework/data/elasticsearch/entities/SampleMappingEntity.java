@@ -15,12 +15,11 @@
  */
 package org.springframework.data.elasticsearch.entities;
 
-import static org.springframework.data.elasticsearch.annotations.FieldIndex.*;
-import static org.springframework.data.elasticsearch.annotations.FieldType.String;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
+
+import static org.springframework.data.elasticsearch.annotations.FieldType.text;
 
 /**
  * @author Rizwan Idrees
@@ -29,41 +28,41 @@ import org.springframework.data.elasticsearch.annotations.Field;
 @Document(indexName = "test-mapping", type = "mapping", shards = 1, replicas = 0, refreshInterval = "-1")
 public class SampleMappingEntity {
 
-	@Id
-	private String id;
+    @Id
+    private String id;
 
-	@Field(type = String, index = not_analyzed, store = true, analyzer = "standard")
-	private String message;
+    @Field(type = text, index = false, store = true, analyzer = "standard")
+    private String message;
 
-	private NestedEntity nested;
+    private NestedEntity nested;
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public String getMessage() {
-		return message;
-	}
+    public String getMessage() {
+        return message;
+    }
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
-	static class NestedEntity {
+    static class NestedEntity {
 
-		@Field(type = String)
-		private String someField;
+        @Field(type = text)
+        private String someField;
 
-		public String getSomeField() {
-			return someField;
-		}
+        public String getSomeField() {
+            return someField;
+        }
 
-		public void setSomeField(String someField) {
-			this.someField = someField;
-		}
-	}
+        public void setSomeField(String someField) {
+            this.someField = someField;
+        }
+    }
 }

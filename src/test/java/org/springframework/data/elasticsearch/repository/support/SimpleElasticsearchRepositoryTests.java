@@ -15,16 +15,7 @@
  */
 package org.springframework.data.elasticsearch.repository.support;
 
-import static org.apache.commons.lang.RandomStringUtils.*;
-import static org.elasticsearch.index.query.QueryBuilders.*;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import com.google.common.collect.Lists;
+import org.elasticsearch.common.util.CollectionUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +30,16 @@ import org.springframework.data.elasticsearch.entities.SampleEntity;
 import org.springframework.data.elasticsearch.repositories.sample.SampleElasticsearchRepository;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 /**
  * @author Rizwan Idrees
@@ -229,7 +230,7 @@ public class SimpleElasticsearchRepositoryTests {
 
 		// then
 		assertNotNull("sample entities cant be null..", sampleEntities);
-		List<SampleEntity> entities = Lists.newArrayList(sampleEntities);
+		List<SampleEntity> entities =  CollectionUtils.iterableAsArrayList(sampleEntities);
 		assertThat(entities.size(), is(2));
 	}
 
