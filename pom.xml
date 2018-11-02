@@ -3,32 +3,57 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.springframework.data</groupId>
+    <groupId>com.vortex.platform</groupId>
     <artifactId>spring-data-elasticsearch-es550</artifactId>
     <version>2.1.9-SNAPSHOT</version>
 
-    <parent>
-        <groupId>org.springframework.data.build</groupId>
-        <artifactId>spring-data-parent</artifactId>
-        <version>1.9.9.RELEASE</version>
-        <relativePath>../spring-data-build/parent/pom.xml</relativePath>
-    </parent>
-
     <name>Spring Data Elasticsearch With Elasticsearch Version 5.5.0</name>
-    <description>Spring Data Implementation for Elasticsearch nnd with Elasticsearch version 5.5.0</description>
+    <description>由于早期版本的Spring Data Elasticsearch (SDES)中的Elasticsearch (ES)版本较低，基于Spring Data Elasticsearch
+        2.1.9.RELEASE版本，将原来ES的2.4.0版本更改为5.5.0，原SDES的代码请查看：https://github.com/spring-projects/spring-data-elasticsearch
+    </description>
+
     <url>https://github.com/spring-projects/spring-data-elasticsearch</url>
 
     <properties>
 
         <dist.key>DATAES</dist.key>
 
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+
         <commonscollections>3.2.1</commonscollections>
         <commonslang>2.6</commonslang>
         <elasticsearch>5.5.0</elasticsearch>
         <springdata.commons>1.13.9.RELEASE</springdata.commons>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+
+
+        <aspectj>1.8.12</aspectj>
+        <cdi>1.0</cdi>
+        <commons-io>2.5</commons-io>
+        <guava>19.0</guava>
+        <hamcrest>1.3</hamcrest>
+        <jackson>2.8.10</jackson>
+        <jacoco>0.7.9</jacoco>
+        <jodatime>2.9.9</jodatime>
+        <jsonpath>2.2.0</jsonpath>
+        <junit>4.12</junit>
+        <logback>1.1.7</logback>
+        <lombok>1.16.18</lombok>
+        <mockito>1.10.19</mockito>
+        <querydsl>4.1.4</querydsl>
+        <rxjava>1.2.10</rxjava>
+        <slf4j>1.7.25</slf4j>
+        <spring>4.3.13.RELEASE</spring>
+        <spring-hateoas>0.23.0.RELEASE</spring-hateoas>
+        <threetenbp>1.3.6</threetenbp>
+        <validation>1.0.0.GA</validation>
+        <webbeans>1.2.8</webbeans>
+
 
     </properties>
 
@@ -38,6 +63,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
+            <version>${spring}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
@@ -49,6 +75,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
+            <version>${spring}</version>
         </dependency>
 
         <!-- SPRING DATA -->
@@ -124,6 +151,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
+            <version>${spring}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -175,6 +203,56 @@
             <version>2.8.2</version>
         </dependency>
 
+        <!-- Test -->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <version>${hamcrest}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>${hamcrest}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -182,14 +260,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>wagon-maven-plugin</artifactId>
+                <version>1.0</version>
             </plugin>
             <plugin>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>
+                <version>1.5.5</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -203,17 +284,23 @@
     </build>
 
     <profiles>
+
         <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.jfrog.buildinfo</groupId>
-                        <artifactId>artifactory-maven-plugin</artifactId>
-                        <inherited>false</inherited>
-                    </plugin>
-                </plugins>
-            </build>
+            <id>vortex</id>
+
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>hangzhou-nexus-snapshot</id>
+                    <name>jishulink snapshots</name>
+                    <url>http://maven.envcloud.com.cn:8081/nexus/content/repositories/snapshots/</url>
+                </snapshotRepository>
+                <repository>
+                    <id>hangzhou-nexus-releases</id>
+                    <name>jishulink releases</name>
+                    <url>http://maven.envcloud.com.cn:8081/nexus/content/repositories/releases/</url>
+                </repository>
+            </distributionManagement>
+
         </profile>
     </profiles>
 
@@ -222,6 +309,11 @@
             <id>biomedcentral</id>
             <name>BioMed Central Development Team</name>
             <timezone>+0</timezone>
+        </developer>
+        <developer>
+            <id>carrotphoto</id>
+            <name>Qian Liping</name>
+            <timezone>+8</timezone>
         </developer>
     </developers>
 
@@ -238,22 +330,5 @@
             <url>https://repo.spring.io/plugins-release</url>
         </pluginRepository>
     </pluginRepositories>
-
-    <scm>
-        <url>https://github.com/spring-projects/spring-data-elasticsearch</url>
-        <connection>scm:git:git://github.com/spring-projects/spring-data-elasticsearch.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/spring-projects/spring-data-elasticsearch.git
-        </developerConnection>
-    </scm>
-
-    <ciManagement>
-        <system>Bamboo</system>
-        <url>http://build.springsource.org/browse/SPRINGDATAES</url>
-    </ciManagement>
-
-    <issueManagement>
-        <system>JIRA</system>
-        <url>https://jira.springsource.org/browse/DATAES</url>
-    </issueManagement>
 
 </project>
